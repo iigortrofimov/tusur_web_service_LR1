@@ -6,7 +6,7 @@ install:
   - pip3 install flask_wtf
   - pip3 install gunicorn
   - pip3 install requests
-  - pip3 install PIL
+  - pip3 install Pillow
   - pip3 install werkzeug
   - pip3 install sklearn
   - pip3 install matplotlib
