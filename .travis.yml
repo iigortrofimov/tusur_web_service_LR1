@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.9.7"
+  - "3.9"
 before_install:
   - chmod +x ./flaskapp/st.sh
   - sudo apt-get install libgl1
