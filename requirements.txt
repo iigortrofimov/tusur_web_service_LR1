@@ -3,6 +3,6 @@ Flask-WTF==0.15.1
 gunicorn==20.1.0
 requests==2.26.0
 Pillow==8.3.2
-skikit-learn==1.0
+skikit-learn==1.0.0
 matplotlib==3.3.4
 opencv-python==4.5.3.56
