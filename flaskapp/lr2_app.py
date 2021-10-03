@@ -4,7 +4,11 @@ import string
 
 from PIL import Image
 from flask import Flask, flash, request, redirect, url_for, render_template
+from flask_recaptcha import ReCaptcha
+from flask_wtf import FlaskForm, RecaptchaField
 from werkzeug.utils import secure_filename
+
+import color_recogniser
 
 app = Flask(__name__)
 
@@ -14,7 +18,19 @@ app.secret_key = ''.join(random.choice(string.ascii_letters + string.digits) for
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
+# используем капчу и полученные секретные ключи с сайта Google
+app.config['RECAPTCHA_USE_SSL'] = False
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdiKukUAAAAAGOH6Wve-LnDOwd5AyoGFSf4mRzm'
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdiKukUAAAAAG16BmzRIq51tWhmQKRQ281q9wOt'
+app.config['RECAPTCHA_OPTIONS'] = {'theme': 'custom'}
+
+recaptcha = ReCaptcha(app)
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+
+class NetForm(FlaskForm):
+    recaptcha = RecaptchaField()
 
 
 def allowed_file(filename):
@@ -23,11 +39,13 @@ def allowed_file(filename):
 
 @app.route('/')
 def upload_form():
-    return render_template('index.html')
+    form = NetForm()
+    return render_template('index.html', form=form)
 
 
 @app.route('/', methods=['POST'])
 def upload_file():
+    form = NetForm()
     if request.method == 'POST':
         # check if the post request has the files part
         if 'files[]' not in request.files:
@@ -50,7 +68,15 @@ def upload_file():
         elif request.form.get('mergetype').__eq__('Горизонтальный'):
             final_filename = merge_horizontal(files[0].filename, files[1].filename)
 
-        return render_template('index.html', filename=final_filename)
+        color_recogniser.analyse_color("./static/uploads/" + final_filename)
+        color_recogniser.analyse_color("./static/uploads/" + files[0].filename)
+        color_recogniser.analyse_color("./static/uploads/" + files[1].filename)
+
+        return render_template('index.html', filename=final_filename,
+                               color_analyse1='analyse_' + files[0].filename,
+                               color_analyse2='analyse_' + files[1].filename,
+                               color_analyse_res='analyse_' + final_filename,
+                               form=form)
 
 
 @app.route('/display/<filename>')
