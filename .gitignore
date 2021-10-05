@@ -128,4 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-flaskapp/static/uploads/*
+flaskapp/static/uploads/*.jpg
